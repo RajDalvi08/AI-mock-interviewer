@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import { mappings } from '@/constants/index.ts'
+import { mappings } from '@/constants/index'
 
 interface TechIconProps {
   techStack: string[]
