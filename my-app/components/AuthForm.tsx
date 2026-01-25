@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { z as Z } from "zod"
+import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,28 +27,27 @@ import { signUp, signIn } from "@/lib/actions/auth.actions"
 
 type FormType = "sign-in" | "sign-up"
 
+/* ✅ Zod schema factory */
 const getAuthFormSchema = (type: FormType) =>
-  Z.object({
+  z.object({
     name:
       type === "sign-up"
-        ? Z.string().min(3, "Name must be at least 3 characters")
-        : Z.string().optional(),
-    email: Z.string().email("Invalid email"),
-    password: Z.string().min(6, "Password must be at least 6 characters"),
+        ? z.string().min(3, "Name must be at least 3 characters")
+        : z.string().optional(),
+    email: z.string().email("Invalid email"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
   })
-
-interface FormValues {
-  name?: string
-  email: string
-  password: string
-}
 
 const AuthForm = ({ type }: { type: FormType }) => {
   const isSignIn = type === "sign-in"
   const router = useRouter()
 
+  /* ✅ Infer type directly from schema */
+  const schema = getAuthFormSchema(type)
+  type FormValues = z.infer<typeof schema>
+
   const form = useForm<FormValues>({
-    resolver: zodResolver(getAuthFormSchema(type)),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       email: "",
@@ -60,18 +59,16 @@ const AuthForm = ({ type }: { type: FormType }) => {
     try {
       if (!isSignIn) {
         // 🔹 SIGN UP
-        const { name, email, password } = values
-
         const userCredential = await createUserWithEmailAndPassword(
           auth,
-          email,
-          password
+          values.email,
+          values.password
         )
 
         const result = await signUp({
           uid: userCredential.user.uid,
-          name: name!,
-          email,
+          name: values.name!,
+          email: values.email,
         })
 
         if (!result?.success) {
@@ -105,33 +102,18 @@ const AuthForm = ({ type }: { type: FormType }) => {
         router.push("/")
       }
     } catch (error: any) {
-      console.error(error)
-
-      // ✅ Firebase-friendly errors
       switch (error.code) {
         case "auth/email-already-in-use":
-          toast.error("Email already registered. Please sign in.")
-          router.push("/sign-in")
+          toast.error("Email already registered.")
           break
-
-        case "auth/invalid-email":
-          toast.error("Invalid email address.")
-          break
-
-        case "auth/weak-password":
-          toast.error("Password must be at least 6 characters.")
-          break
-
         case "auth/wrong-password":
           toast.error("Incorrect password.")
           break
-
         case "auth/user-not-found":
-          toast.error("No account found. Please sign up.")
+          toast.error("No account found.")
           break
-
         default:
-          toast.error("Authentication failed. Please try again.")
+          toast.error("Authentication failed.")
       }
     }
   }
@@ -158,7 +140,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>Name</FieldLabel>
-                    <Input {...field} placeholder="Enter your name" />
+                    <Input {...field} />
                     {fieldState.error && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -175,7 +157,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Email</FieldLabel>
-                  <Input {...field} type="email" placeholder="Enter your email" />
+                  <Input {...field} type="email" />
                   {fieldState.error && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -191,11 +173,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Password</FieldLabel>
-                  <Input
-                    {...field}
-                    type="password"
-                    placeholder="Enter password"
-                  />
+                  <Input {...field} type="password" />
                   {fieldState.error && (
                     <FieldError errors={[fieldState.error]} />
                   )}
