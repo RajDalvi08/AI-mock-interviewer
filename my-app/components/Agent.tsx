@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
@@ -16,8 +16,11 @@ interface AgentProps {
 }
 
 const Agent = ({ userName }: AgentProps) => {
-  const isSpeaking = true;
-  const callStatus = CallStatus.INACTIVE; // later replace with real state
+  const [callStatus, setCallStatus] = useState<CallStatus>(
+    CallStatus.INACTIVE
+  );
+
+  const isSpeaking = callStatus === CallStatus.ACTIVE;
 
   const messages = [
     "What's your name?",
@@ -25,6 +28,19 @@ const Agent = ({ userName }: AgentProps) => {
   ];
 
   const lastMessage = messages[messages.length - 1];
+
+  const handleCallStart = () => {
+    setCallStatus(CallStatus.CONNECTING);
+
+    // simulate connection
+    setTimeout(() => {
+      setCallStatus(CallStatus.ACTIVE);
+    }, 1500);
+  };
+
+  const handleCallEnd = () => {
+    setCallStatus(CallStatus.FINISHED);
+  };
 
   return (
     <>
@@ -80,7 +96,11 @@ const Agent = ({ userName }: AgentProps) => {
       {/* CALL CONTROLS */}
       <div className="w-full flex justify-center">
         {callStatus !== CallStatus.ACTIVE ? (
-          <button className="btn-call relative overflow-hidden">
+          <button
+            className="btn-call relative overflow-hidden"
+            onClick={handleCallStart}
+            disabled={callStatus === CallStatus.CONNECTING}
+          >
             {callStatus === CallStatus.CONNECTING && (
               <span className="absolute inset-0 rounded-full animate-ping bg-primary/40" />
             )}
@@ -93,7 +113,9 @@ const Agent = ({ userName }: AgentProps) => {
             </span>
           </button>
         ) : (
-          <button className="btn-disconnect">End</button>
+          <button className="btn-disconnect" onClick={handleCallEnd}>
+            End
+          </button>
         )}
       </div>
     </>
