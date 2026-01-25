@@ -15,6 +15,12 @@ interface InterviewCardProps {
   techstack: string[];
   createdAt: string;
 }
+// Define the Feedback type
+interface Feedback {
+  totalScore: number;
+  finalAssessment: string;
+  createdAt: string;
+}
 
 const InterviewCard = ({
   interviewId,
