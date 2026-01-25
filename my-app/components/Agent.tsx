@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -15,14 +17,18 @@ interface AgentProps {
 
 const Agent = ({ userName }: AgentProps) => {
   const isSpeaking = true;
-  const callStatus = CallStatus.INACTIVE; // replace with real state
+  const callStatus = CallStatus.INACTIVE; // later replace with real state
+
   const messages = [
-    'Whats your name?',
-    'My name is John Doe, nice to meet you!'
-  ]
+    "What's your name?",
+    'My name is John Doe, nice to meet you!',
+  ];
+
   const lastMessage = messages[messages.length - 1];
+
   return (
     <>
+      {/* CALL VIEW */}
       <div className="call-view">
         {/* AI INTERVIEWER */}
         <div className="card-interviewer">
@@ -44,7 +50,7 @@ const Agent = ({ userName }: AgentProps) => {
           <div className="card-content">
             <Image
               src="/user-avatar.png"
-              alt="user avatar"
+              alt="User avatar"
               width={120}
               height={120}
               className="rounded-full object-cover"
@@ -53,11 +59,21 @@ const Agent = ({ userName }: AgentProps) => {
           </div>
         </div>
       </div>
+
+      {/* TRANSCRIPT */}
       {messages.length > 0 && (
-        <div className='transcript-border'>
-            <div className="transcript">
-                <p key={lastMessage} className={cn('transition-opacity duration-500 opacity-0', 'animate-fadeIn opacity-100')}>{lastMessage}</p>
-            </div>
+        <div className="transcript-border">
+          <div className="transcript">
+            <p
+              key={lastMessage}
+              className={cn(
+                'transition-opacity duration-500 opacity-0',
+                'animate-fadeIn opacity-100'
+              )}
+            >
+              {lastMessage}
+            </p>
+          </div>
         </div>
       )}
 
@@ -65,13 +81,11 @@ const Agent = ({ userName }: AgentProps) => {
       <div className="w-full flex justify-center">
         {callStatus !== CallStatus.ACTIVE ? (
           <button className="btn-call relative overflow-hidden">
-            {/* ping effect ONLY while connecting */}
             {callStatus === CallStatus.CONNECTING && (
               <span className="absolute inset-0 rounded-full animate-ping bg-primary/40" />
             )}
 
-            {/* button label */}
-            <span className="relative z-10 ">
+            <span className="relative z-10">
               {callStatus === CallStatus.INACTIVE ||
               callStatus === CallStatus.FINISHED
                 ? 'Call'
