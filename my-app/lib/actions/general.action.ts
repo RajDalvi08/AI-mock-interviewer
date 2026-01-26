@@ -6,10 +6,55 @@ import { google } from "@ai-sdk/google";
 import { db } from "@/firebase/admin";
 import { feedbackSchema } from "@/constants";
 
+// Interface and Type Declarations (these are inferred but might need to be adjusted)
+interface CreateFeedbackParams {
+  interviewId: string;
+  userId: string;
+  transcript: { role: string; content: string }[];
+  feedbackId?: string;
+}
+
+interface Feedback {
+  id: string;
+  interviewId: string;
+  userId: string;
+  totalScore: number;
+  categoryScores: {
+    communicationSkills: number;
+    technicalKnowledge: number;
+    problemSolving: number;
+    culturalAndRoleFit: number;
+    confidenceAndClarity: number;
+  };
+  strengths: string;
+  areasForImprovement: string;
+  finalAssessment: string;
+  createdAt: string;
+}
+
+interface Interview {
+  id: string;
+  userId: string;
+  finalized: boolean;
+  createdAt: string;
+  // Add other interview-related fields as needed
+}
+
+interface GetFeedbackByInterviewIdParams {
+  interviewId: string;
+  userId: string;
+}
+
+interface GetLatestInterviewsParams {
+  userId: string;
+  limit?: number;
+}
+
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript, feedbackId } = params;
 
   try {
+    // Format the transcript for the AI model
     const formattedTranscript = transcript
       .map(
         (sentence: { role: string; content: string }) =>
@@ -17,6 +62,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
       )
       .join("");
 
+    // Request AI to evaluate the interview
     const { object } = await generateObject({
       model: google("gemini-2.0-flash-001", {
         structuredOutputs: false,
@@ -38,6 +84,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
         "You are a professional interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories",
     });
 
+    // Prepare the feedback object to be stored in Firebase
     const feedback = {
       interviewId: interviewId,
       userId: userId,
@@ -49,14 +96,17 @@ export async function createFeedback(params: CreateFeedbackParams) {
       createdAt: new Date().toISOString(),
     };
 
+    // Reference to store feedback in Firebase
     let feedbackRef;
 
+    // Either update existing feedback or create a new document
     if (feedbackId) {
       feedbackRef = db.collection("feedback").doc(feedbackId);
     } else {
       feedbackRef = db.collection("feedback").doc();
     }
 
+    // Save the feedback in Firestore
     await feedbackRef.set(feedback);
 
     return { success: true, feedbackId: feedbackRef.id };
@@ -66,12 +116,14 @@ export async function createFeedback(params: CreateFeedbackParams) {
   }
 }
 
+// Get an interview by its ID
 export async function getInterviewById(id: string): Promise<Interview | null> {
   const interview = await db.collection("interviews").doc(id).get();
 
   return interview.data() as Interview | null;
 }
 
+// Get feedback by interview and user ID
 export async function getFeedbackByInterviewId(
   params: GetFeedbackByInterviewIdParams
 ): Promise<Feedback | null> {
@@ -90,6 +142,7 @@ export async function getFeedbackByInterviewId(
   return { id: feedbackDoc.id, ...feedbackDoc.data() } as Feedback;
 }
 
+// Get the latest interviews excluding the current user's interviews
 export async function getLatestInterviews(
   params: GetLatestInterviewsParams
 ): Promise<Interview[] | null> {
@@ -109,6 +162,7 @@ export async function getLatestInterviews(
   })) as Interview[];
 }
 
+// Get all interviews by a specific user ID
 export async function getInterviewsByUserId(
   userId: string
 ): Promise<Interview[] | null> {
