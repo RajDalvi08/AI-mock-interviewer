@@ -30,6 +30,14 @@ interface AgentProps {
   questions?: string[];
 }
 
+// Define Message type based on your usage
+interface Message {
+  type: "transcript" | "other"; // expand types based on actual events
+  role: "user" | "system" | "assistant";
+  transcript: string;
+  transcriptType: "final" | "partial"; // Depending on the transcript type
+}
+
 const Agent = ({
   userName,
   userId,
@@ -45,14 +53,17 @@ const Agent = ({
   const [lastMessage, setLastMessage] = useState<string>("");
 
   useEffect(() => {
+    // Event handler when the call starts
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
     };
 
+    // Event handler when the call ends
     const onCallEnd = () => {
       setCallStatus(CallStatus.FINISHED);
     };
 
+    // Event handler for receiving messages
     const onMessage = (message: Message) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
         const newMessage = { role: message.role, content: message.transcript };
@@ -60,31 +71,34 @@ const Agent = ({
       }
     };
 
+    // Event handler when speech starts
     const onSpeechStart = () => {
-      console.log("speech start");
       setIsSpeaking(true);
     };
 
+    // Event handler when speech ends
     const onSpeechEnd = () => {
-      console.log("speech end");
       setIsSpeaking(false);
     };
 
+    // Event handler for errors
     const onError = (error: Error) => {
       console.log("Error:", error);
     };
 
+    // Register event listeners
     vapi.on("call-start", onCallStart);
     vapi.on("call-end", onCallEnd);
-    vapi.on("message", onMessage);
+    vapi.on("message", onMessage); // Listen for message events
     vapi.on("speech-start", onSpeechStart);
     vapi.on("speech-end", onSpeechEnd);
     vapi.on("error", onError);
 
+    // Clean up event listeners on component unmount
     return () => {
       vapi.off("call-start", onCallStart);
       vapi.off("call-end", onCallEnd);
-      vapi.off("message", onMessage);
+      vapi.off("message", onMessage); // Remove message event listener
       vapi.off("speech-start", onSpeechStart);
       vapi.off("speech-end", onSpeechEnd);
       vapi.off("error", onError);
@@ -92,13 +106,13 @@ const Agent = ({
   }, []);
 
   useEffect(() => {
+    // Update last message whenever new message is added
     if (messages.length > 0) {
       setLastMessage(messages[messages.length - 1].content);
     }
 
+    // Handle feedback generation once the call ends
     const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-      console.log("handleGenerateFeedback");
-
       const { success, feedbackId: id } = await createFeedback({
         interviewId: interviewId!,
         userId: userId!,
@@ -114,15 +128,17 @@ const Agent = ({
       }
     };
 
+    // Check if call is finished and trigger feedback handling
     if (callStatus === CallStatus.FINISHED) {
       if (type === "generate") {
-        router.push("/");
+        router.push("/"); // Redirect if it's a "generate" type call
       } else {
-        handleGenerateFeedback(messages);
+        handleGenerateFeedback(messages); // Handle feedback for custom calls
       }
     }
   }, [messages, callStatus, feedbackId, interviewId, router, type, userId]);
 
+  // Function to start a call
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
 
@@ -149,6 +165,7 @@ const Agent = ({
     }
   };
 
+  // Function to disconnect the call
   const handleDisconnect = () => {
     setCallStatus(CallStatus.FINISHED);
     vapi.stop();

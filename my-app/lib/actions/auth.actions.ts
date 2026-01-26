@@ -3,7 +3,7 @@
 import { db, auth } from "@/firebase/admin"
 import { cookies } from "next/headers"
 
-const ONE_WEEK = 60 * 60 * 24 * 7
+const ONE_WEEK = 60 * 60 * 24 * 7 // 7 days in seconds
 
 // ================= TYPES =================
 interface SignUpParams {
@@ -29,6 +29,7 @@ export async function signUp(params: SignUpParams) {
   const { uid, name, email } = params
 
   try {
+    // Check if user exists
     const userRecord = await db.collection("users").doc(uid).get()
 
     if (userRecord.exists) {
@@ -38,6 +39,7 @@ export async function signUp(params: SignUpParams) {
       }
     }
 
+    // Create new user
     await db.collection("users").doc(uid).set({
       name,
       email,
@@ -52,7 +54,7 @@ export async function signUp(params: SignUpParams) {
     console.error("Error creating user", e)
     return {
       success: false,
-      message: "Failed to create an account",
+      message: "Failed to create an account. Please try again.",
     }
   }
 }
@@ -62,6 +64,7 @@ export async function signIn(params: SignInParams) {
   const { email, idToken } = params
 
   try {
+    // Verify if the user exists by email
     const userRecord = await auth.getUserByEmail(email)
 
     if (!userRecord) {
@@ -71,13 +74,14 @@ export async function signIn(params: SignInParams) {
       }
     }
 
+    // Set session cookie
     await setSessionCookie(idToken)
     return { success: true }
   } catch (e) {
-    console.error(e)
+    console.error("Sign-in error:", e)
     return {
       success: false,
-      message: "Failed to log into account",
+      message: "Failed to log into account. Please try again.",
     }
   }
 }
@@ -86,17 +90,24 @@ export async function signIn(params: SignInParams) {
 async function setSessionCookie(idToken: string) {
   const cookieStore = await cookies()
 
-  const sessionCookie = await auth.createSessionCookie(idToken, {
-    expiresIn: ONE_WEEK * 1000,
-  })
+  try {
+    // Create session cookie with 1-week expiration
+    const sessionCookie = await auth.createSessionCookie(idToken, {
+      expiresIn: ONE_WEEK * 1000, // milliseconds
+    })
 
-  cookieStore.set("session", sessionCookie, {
-    maxAge: ONE_WEEK,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-  })
+    // Set session cookie in browser
+    cookieStore.set("session", sessionCookie, {
+      maxAge: ONE_WEEK,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // set secure flag in production
+      sameSite: "lax",
+      path: "/",
+    })
+  } catch (e) {
+    console.error("Error setting session cookie:", e)
+    throw new Error("Failed to create session cookie.")
+  }
 }
 
 // ================= CURRENT USER =================
@@ -104,30 +115,29 @@ export async function getCurrentUser(): Promise<User | null> {
   const cookieStore = await cookies()
   const sessionCookie = cookieStore.get("session")?.value
 
-  if (!sessionCookie) return null
+  if (!sessionCookie) return null // No session cookie means no user is logged in
 
   try {
+    // Verify session cookie
     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true)
 
-    const userDoc = await db
-      .collection("users")
-      .doc(decodedClaims.uid)
-      .get()
+    // Retrieve user data from Firestore
+    const userDoc = await db.collection("users").doc(decodedClaims.uid).get()
 
     if (!userDoc.exists) return null
 
     return {
       id: userDoc.id,
-      ...(userDoc.data() as Omit<User, "id">),
+      ...(userDoc.data() as Omit<User, "id">), // Mapping data to User interface
     }
   } catch (e) {
     console.error("getCurrentUser error:", e)
-    return null
+    return null // Invalid or expired session
   }
 }
 
 // ================= AUTH CHECK =================
 export async function isAuthenticated(): Promise<boolean> {
   const user = await getCurrentUser()
-  return Boolean(user)
+  return Boolean(user) // Returns true if user is logged in, false if not
 }
