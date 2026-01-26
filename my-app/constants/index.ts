@@ -1,4 +1,4 @@
-{/*import { CreateAssistantDTO } from "@vapi-ai/web/dist/api"; */}
+import { CreateAssistantDTO } from "@vapi-ai/web/dist/api"; 
 import { z } from "zod";
 
 export const mappings = {
@@ -96,7 +96,7 @@ export const mappings = {
   vercel: "vercel",
   "aws amplify": "amplify",
 };
-{/*
+
 export const interviewer: CreateAssistantDTO = {
   name: "Interviewer",
   firstMessage:
@@ -154,7 +154,7 @@ End the conversation on a polite and positive note.
     ],
   },
 };
-*/}
+
 export const feedbackSchema = z.object({
   totalScore: z.number(),
   categoryScores: z.tuple([
