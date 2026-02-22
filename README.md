@@ -1,73 +1,69 @@
-🤖 AI Mock Interviewer
+# 🤖 **AI MOCK INTERVIEWER**
 
-An AI-powered mock interview platform built with Next.js 13+ (App Router) that helps users practice technical interviews with realistic, AI-generated questions and structured role-based flows.
+An **AI-powered mock interview platform** built using **Next.js 13+ (App Router)** that helps users practice technical interviews with **realistic, AI-generated questions and structured role-based flows**.
 
-Deployed on Vercel 🚀
+🚀 **Live & Deployed on Vercel**
 
-🧠 Overview
+---
 
-AI Mock Interviewer allows users to:
+## 🧠 **PROJECT OVERVIEW**
 
-Select a job role
+**AI Mock Interviewer** is designed to simulate real interview environments where users can:
 
-Choose an experience level
+* 🎯 Select a **job role**
+* 📊 Choose an **experience level**
+* 🧰 Provide their **tech stack**
+* 🤖 Instantly generate **AI-driven interview questions**
 
-Provide a tech stack
+The platform delivers a **structured and dynamic interview experience** using modern full-stack architecture.
 
-Generate realistic AI-driven interview questions instantly
+---
 
-The platform simulates structured interviews using a modern full-stack architecture powered by Next.js App Router and API routes.
+## ✨ **FEATURES**
 
-✨ Features
+* 🔐 **Authentication System** (Sign In / Sign Up)
+* 🎤 **AI-powered Interview Question Generation**
+* 🧩 **Role-based Dynamic Interview Flow**
+* ⚡ **Next.js 13+ App Router Architecture**
+* 🧪 **API Routes using `route.ts`**
+* 🎨 **Modern UI with Global Styling**
+* ☁️ **Fully Deployed on Vercel**
+* 📦 **TypeScript Support**
+* 📁 **Scalable Folder Structure using Route Groups**
 
-🔐 Authentication (Sign In / Sign Up)
+---
 
-🎤 AI-powered interview question generation
+## 🛠️ **TECH STACK**
 
-🧩 Role-based dynamic interview flow
+### 💻 **Frontend**
 
-⚡ Next.js 13+ App Router architecture
+* **Next.js 13+ (App Router)**
+* **React.js**
+* **TypeScript**
+* **CSS / Global Styling**
 
-🧪 API Routes using route.ts
+### ⚙️ **Backend**
 
-🎨 Modern UI with global styling
+* **Next.js API Routes (`route.ts`)**
+* **Server-side Request Handling**
 
-☁️ Fully deployed on Vercel
+### 🤖 **AI INTEGRATION**
 
-📦 TypeScript support
+* **Vapi AI** for generating interview questions dynamically
 
-📁 Clean folder structure using route groups
+### 🔐 **AUTHENTICATION**
 
-🛠️ Tech Stack
-Frontend
+* Custom Auth / Firebase / JWT *(based on implementation)*
 
-Next.js 13+ (App Router)
+### 🚀 **DEPLOYMENT**
 
-React
+* **Vercel**
 
-TypeScript
+---
 
-CSS / Global Styling
+## 📂 **PROJECT STRUCTURE**
 
-Backend
-
-Next.js API Routes (route.ts)
-
-Server-side request handling
-
-AI Integration
-
-Vapi AI (for interview question generation)
-
-Authentication
-
-Custom Auth / Firebase / JWT (based on implementation)
-
-Deployment
-
-Vercel
-
-🗂️ Project Structure
+```id="az3l9s"
 my-app/
 │
 ├── app/
@@ -90,28 +86,40 @@ my-app/
 │   │   └── page.tsx
 │   │
 │   ├── globals.css
+│   │
 │   └── layout.tsx
 │
 ├── types/
 ├── public/
 ├── package.json
 └── README.md
+```
 
-⚙️ API Usage
-Generate AI Interview
+---
 
-Endpoint
+## ⚙️ **API USAGE**
 
+### 🤖 **Generate AI Interview Questions**
+
+**Endpoint**
+
+```id="1sjzkg"
 POST /api/vapi/generate
+```
 
-Request Body
+**Request Body**
+
+```json id="s8f8gl"
 {
   "role": "Frontend Developer",
   "level": "Junior",
   "techStack": ["React", "JavaScript"]
 }
+```
 
-Response
+**Response**
+
+```json id="mrd7wr"
 {
   "success": true,
   "questions": [
@@ -119,93 +127,137 @@ Response
     "What is a closure in JavaScript?"
   ]
 }
+```
 
-🧪 Run Locally
-1️⃣ Clone the repository
+---
+
+## 🧪 **RUN LOCALLY**
+
+### 1️⃣ Clone the Repository
+
+```bash id="p2v9lq"
 git clone https://github.com/RajDalvi08/AI-mock-interviewer.git
+```
+
+### 2️⃣ Navigate to Project
+
+```bash id="u9s2ka"
 cd AI-mock-interviewer/my-app
+```
 
-2️⃣ Install dependencies
+### 3️⃣ Install Dependencies
+
+```bash id="h4p8je"
 npm install
+```
 
-3️⃣ Add environment variables
+### 4️⃣ Setup Environment Variables
 
-Create a .env.local file in my-app/:
+Create a `.env.local` file inside `my-app/`:
 
+```env id="a0m2xe"
 VAPI_API_KEY=your_api_key_here
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
+👉 Add authentication keys if required
 
-(Add authentication keys if required)
+---
 
-4️⃣ Start development server
+### 5️⃣ Start Development Server
+
+```bash id="j3w8zt"
 npm run dev
+```
 
+---
 
-App runs at:
+### 🌐 **App Runs At**
 
+```id="b4d1rk"
 http://localhost:3000
+```
 
+### 🔗 **API Endpoint**
 
-API available at:
-
+```id="t8s9nm"
 http://localhost:3000/api/vapi/generate
+```
 
-🚀 Deployment
+---
 
-This project is deployed using Vercel.
+## 🚀 **DEPLOYMENT (VERCEL)**
 
-Deployment Steps
+This project is fully deployed using **Vercel**.
 
-Push code to GitHub
+### 📌 Steps:
 
-Import repository into Vercel
+1. Push code to GitHub
+2. Import repository into Vercel
+3. Add environment variables
+4. Deploy 🎉
 
-Add required environment variables
+---
 
-Deploy 🎉
+## 🧯 **COMMON ISSUES & FIXES**
 
-🧯 Common Issues & Fixes
-❌ 404 on API route
+### ❌ **404 on API Route**
 
-Make sure your API file path is:
+✔ Ensure correct file path:
 
+```id="z7q3lm"
 app/api/vapi/generate/route.ts
+```
 
+✔ Verify:
 
-Also verify:
+* Correct folder naming
+* Using **App Router (not Pages Router)**
 
-Folder naming is correct
+---
 
-You're using App Router (not Pages Router)
+### ❌ **Authentication Redirect Loop**
 
-❌ Authentication Redirect Loop
+✔ Check:
 
-Check:
+* `isAuthenticated()` logic in `layout.tsx`
+* Middleware configuration
+* Token/session validation
 
-isAuthenticated() logic in layout.tsx
+---
 
-Middleware configuration
+## 🎯 **FUTURE ENHANCEMENTS**
 
-Token/session validation
+* 🎯 AI-based **Interview Feedback & Scoring System**
+* 📄 Resume-based Interview Generation
+* 🎙️ Voice / Audio Interview Mode
+* 🛠️ Admin Dashboard
+* 📊 Performance Analytics
 
-📌 Future Improvements
+---
 
-🎯 AI-based interview feedback & scoring
+## 🏆 **KEY HIGHLIGHTS (FOR PORTFOLIO)**
 
-📄 Resume-based interview generation
+* ✅ Full-stack **Next.js App Router implementation**
+* ✅ Real-world **AI integration**
+* ✅ Clean and scalable **folder architecture**
+* ✅ Production-ready deployment on **Vercel**
+* ✅ Strong use of **TypeScript + API design**
 
-🎙️ Voice / Audio interview mode
+---
 
-🛠️ Admin dashboard
+## 👨‍💻 **AUTHOR**
 
+**Raj Dalvi**
+🔗 GitHub: https://github.com/RajDalvi08
 
+---
 
-👨‍💻 Author
+## 📄 **LICENSE**
 
-Raj Dalvi
-GitHub: https://github.com/RajDalvi08
+This project is licensed under the **MIT License**.
 
-📄 License
+---
 
-This project is licensed under the MIT License.
+💡 **Note:** This project stands out as a **real-world AI + full-stack application**, showcasing skills in **system design, API development, and modern frontend architecture**, making it highly valuable for internships and developer roles.
+
